@@ -1,146 +1,111 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Research Topic Submission Form</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Topic Submission</title>
     <style>
-      body {
-        background-color: #000;   /* Black background */
-        color: #fff;  
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 0 20px;
-      }
-      h1 {
-        text-align: center;
-        text-size-adjust: 30px;
-      }
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-      label {
-        font-weight: bold;
-      }
-      input[type="text"],
-      select,
-      input[type="number"] {
-        width: 100%;
-        padding: 8px;
-        box-sizing: border-box;
-      }
-      button {
-        width: 100px;
-        padding: 10px;
-        cursor: pointer;
-      }
-      #response {
-        margin-top: 20px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        min-height: 50px;
-      }
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #222;
+            border-radius: 10px;
+        }
+        input, select, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: red;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: darkred;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
     </style>
-  </head>
-  <body>
-    <h1>Research Topic Submission Form</h1>
+</head>
+<body>
+
+<div class="container">
+    <h2>Research Topic Submission Form</h2>
     <p>This is an AI Agent for research.</p>
-    
-    <form id="researchForm">
-      <!-- Research Topic -->
-      <label for="research_topic">Research Topic</label>
-      <input
-        type="text"
-        id="research_topic"
-        name="research_topic"
-        placeholder="Enter your research topic"
-        required
-      />
 
-      <!-- Department -->
-      <label for="department">For which dept. do you want to research</label>
-      <select id="department" name="department" required>
-        <option value="HR">HR</option>
-        <option value="IT">IT</option>
-        <option value="DM">DM</option>
-        <option value="Tax">Tax</option>
-      </select>
+    <label for="researchTopic">Research Topic</label>
+    <input type="text" id="researchTopic" placeholder="Enter topic">
 
-      <!-- Way of Writing -->
-      <label for="way_of_writing">Way of writing</label>
-      <select id="way_of_writing" name="way_of_writing" required>
-        <option value="Professional">Professional</option>
-        <option value="General">General</option>
-        <option value="Research Paper">Research Paper</option>
-      </select>
+    <label for="department">For which dept. you want to research</label>
+    <select id="department">
+        <option>IT</option>
+        <option>Finance</option>
+        <option>Marketing</option>
+    </select>
 
-      <!-- Number of Sections -->
-      <label for="num_sections">Number of Sections</label>
-      <input
-        type="number"
-        id="num_sections"
-        name="num_sections"
-        min="1"
-        value="1"
-        required
-      />
+    <label for="writingStyle">Way of writing</label>
+    <select id="writingStyle">
+        <option>Professional</option>
+        <option>Casual</option>
+    </select>
 
-      <!-- Submit button -->
-      <button type="submit">Submit</button>
-    </form>
+    <label for="sections">Number of Sections</label>
+    <input type="number" id="sections" min="1" value="1">
 
-    <!-- Response area -->
-    <div id="response"></div>
+    <button onclick="submitForm()">Submit</button>
 
-    <script>
-      document.getElementById("researchForm").addEventListener("submit", async (event) => {
-        event.preventDefault();
+    <div id="response">Waiting for submission...</div>
+</div>
 
-        // Gather form data
-        const research_topic = document.getElementById("research_topic").value;
-        const department = document.getElementById("department").value;
-        const way_of_writing = document.getElementById("way_of_writing").value;
-        const num_sections = document.getElementById("num_sections").value;
+<script>
+async function submitForm() {
+    const researchTopic = document.getElementById("researchTopic").value;
+    const department = document.getElementById("department").value;
+    const writingStyle = document.getElementById("writingStyle").value;
+    const numSections = document.getElementById("sections").value;
 
-        // Prepare payload
-        const payload = {
-          research_topic,
-          department,
-          way_of_writing,
-          num_sections,
-        };
+    const n8nWebhookUrl = "https://your-n8n-instance/webhook/your-webhook-id"; // 🔹 Replace with your n8n webhook URL
 
-        // n8n Webhook URL - replace with your actual webhook endpoint
-        const n8nWebhookUrl = "https://saradev.app.n8n.cloud/webhook/fca81807-5925-426b-9f15-5c94963c8516";
+    document.getElementById("response").innerText = "Submitting... Please wait.";
 
-        // Send POST request
-        try {
-          const response = await fetch(n8nWebhookUrl, {
+    try {
+        const response = await fetch(n8nWebhookUrl, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify(payload),
-          });
+            body: JSON.stringify({
+                research_topic: researchTopic,
+                department: department,
+                way_of_writing: writingStyle,
+                num_sections: numSections
+            })
+        });
 
-          // Check if request was successful
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          // Get the response text (or JSON, depending on your workflow)
-          const result = await response.text();
-
-          // Display the response
-          document.getElementById("response").innerText = result;
-        } catch (error) {
-          console.error("Error:", error);
-          document.getElementById("response").innerText =
-             "Error: " + error.message;
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      });
-    </script>
-  </body>
+
+        const result = await response.json(); // 🔹 Ensure the webhook returns JSON data
+        document.getElementById("response").innerText = "Result:\n" + JSON.stringify(result, null, 2);
+    } catch (error) {
+        document.getElementById("response").innerText = "Error: " + error.message;
+    }
+}
+</script>
+
+</body>
 </html>
